@@ -1,0 +1,64 @@
+<ng-template [ngIf]="paymentPage" [ngIfElse]="homePage">
+  <ng-template [ngIf]="paymentData" [ngIfElse]="loading">
+    <div class="main-div">
+   <mat-card class="vertical-algined-form">
+     <mat-card-title>{{paymentData.payment_receiver}}</mat-card-title>
+     <mat-card-subtitle>Stai eseguendo un pagamento di <span style="font-weight: bolder">{{(paymentData.amount) + "€"}}</span> a {{paymentData.payment_receiver}}</mat-card-subtitle>
+    <mat-card-content>
+      <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="vertical-algined-form ">
+
+        <mat-form-field appearance="fill">
+          <mat-label>Intestatario carta</mat-label>
+          <mat-icon aria-hidden="false" aria-label="Example home icon" matSuffix>person</mat-icon>
+          <input matInput formControlName="customer_name">
+          <mat-error *ngIf="paymentForm.invalid">{{getCustomerNameErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Numero carta</mat-label>
+          <mat-icon aria-hidden="false" aria-label="Example home icon" matSuffix>credit_card</mat-icon>
+          <input matInput formControlName="card_number">
+          <mat-error *ngIf="paymentForm.invalid">{{getCardNumberErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Codice di sicurezza (cvv)</mat-label>
+          <mat-icon aria-hidden="false" aria-label="Example home icon" matSuffix>lock</mat-icon>
+          <input matInput formControlName="cvv">
+          <mat-error *ngIf="paymentForm.invalid">{{getCvvErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Data di scadenza</mat-label>
+          <input matInput [matDatepicker]="picker" [min]="minDate" formControlName="expiration_date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker startView="multi-year" (monthSelected)="closeDatePicker($event, picker)"></mat-datepicker>
+          <mat-error *ngIf="paymentForm.invalid">{{getExpirationDateErrorMessage()}}</mat-error>
+        </mat-form-field>
+
+        <div [ngSwitch]="successfull_payment"> 
+          <button *ngSwitchCase="0" mat-raised-button type="submit" color="primary" [disabled]="!paymentForm.valid">Submit</button>
+          <mat-icon *ngSwitchCase="1" class="material-icons color_green">check_circle</mat-icon>
+          <mat-spinner *ngSwitchCase="2" [diameter]="20"></mat-spinner>
+          <div *ngSwitchCase="3" style="text-aling: center">
+            <mat-icon class="material-icons color_red">error</mat-icon>
+            <p style="text-align: center;">Errore durante il processo di pagamento</p>
+            <p style="text-align: center;">Tornare nella pagina di {{paymentData.payment_receiver}} per tentare un'altra volta</p>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+   </mat-card>
+    </div>
+  </ng-template>
+
+  <ng-template #loading>
+   <div>Loading...</div>
+  </ng-template>
+</ng-template>
+
+<ng-template #homePage>
+ <div>Benvenuto in Paymento Provider</div>
+</ng-template>
+
+
